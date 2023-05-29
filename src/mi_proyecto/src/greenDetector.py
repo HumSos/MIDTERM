@@ -6,7 +6,7 @@ from sensor_msgs.msg import RegionOfInterest
 from cv_bridge import CvBridge
 import ctypes
 from rospy import Time
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import PoseStamped
 
 class detector:
     def detect_green_object(self,image):
@@ -36,7 +36,7 @@ class detector:
         rospy.init_node('green_detector')
         rate=rospy.Rate(10)
         # Crear el publicador para el tópico "green_object"
-        self.pub = rospy.Publisher('/coordenadas', Point, queue_size=10)
+        self.pub = rospy.Publisher('/coordenadas', PoseStamped, queue_size=10)
         while not rospy.is_shutdown():
             self.update()
             rate.sleep()
@@ -69,12 +69,12 @@ class detector:
         cy100 = lib.multiplyCoordinates(ctypes.c_int(y))
         rospy.loginfo("Green object found at coordinates X: " + str(cx100) + ", Y: " + str(cy100) + "\ln")
 
-        point_msg = Point()
-        point_msg.x = cx100
-        point_msg.y = cy100 
-        point_msg.header.stamp = rospy.Time.now()
+        pose_msg = PoseStamped()()
+        pose_msg.pose.position.x = cx100
+        pose_msg.pose.position.y = cy100 
+        pose_msg.header.stamp = rospy.Time.now()
         # Publicar el mensaje en el tópico "green_object"
-        self.pub.publish(point_msg)
+        self.pub.publish(pose_msg)
 
     # Mostrar la imagen con el objeto detectado
     #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
