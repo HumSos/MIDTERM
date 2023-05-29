@@ -7,6 +7,30 @@ from cv_bridge import CvBridge
 import ctypes
 from rospy import Time
 from geometry_msgs.msg import PoseStamped
+import grpc
+from concurrent import futures
+import coordinates_pb2
+import coordinates_pb2_grpc
+
+class CoordinateServiceServicer(coordinates_pb2_grpc.CoordinateServiceServicer):
+    def get_coordinates(self):
+        while True:
+            # Obtener las coordenadas del objeto
+            x, y = get_object_coordinates()
+
+            # Crear un mensaje Coordinate
+            coordinate = coordinates_pb2.Coordinate()
+            coordinate.x = x
+            coordinate.y = y
+
+            yield coordinate
+    def GetCoordinates(self, request, context):
+        # Implementa la lógica para obtener las coordenadas del objeto
+        # y enviarlas como un flujo de mensajes
+        for coordinate in self.get_coordinates():
+            yield coordinate
+
+    
 
 class detector:
     def detect_green_object(self,image):
@@ -37,6 +61,15 @@ class detector:
         rate=rospy.Rate(10)
         # Crear el publicador para el tópico "green_object"
         self.pub = rospy.Publisher('/coordenadas', PoseStamped, queue_size=10)
+
+        # Crear un servidor gRPC
+        server = grpc.server(futures.ThreadPoolExecutor())
+        # Registrar el servicio en el servidor
+        coordinates_pb2_grpc.add_CoordinateServiceServicer_to_server(CoordinateServiceServicer(), server)
+        # Configurar el puerto en el que el servidor escuchará las solicitudes RPC
+        server.add_insecure_port('[::]:50051')
+        server.start()
+
         while not rospy.is_shutdown():
             self.update()
             rate.sleep()
