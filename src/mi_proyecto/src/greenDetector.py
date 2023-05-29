@@ -4,6 +4,16 @@ import rospy
 import cv2
 from sensor_msgs.msg import RegionOfInterest
 from cv_bridge import CvBridge
+import ctypes
+
+# Cargar la librería
+lib = ctypes.CDLL("/home/robotics/catkin_ws/src/mi_proyecto/lib/libmultiply.so")
+
+# Definir el tipo de la función y los argumentos
+multiply_coordinates = lib.multiplyCoordinates
+multiply_coordinates.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double)]
+multiply_coordinates.restype = None
+
 
 class detector:
     def detect_green_object(self,image):
@@ -58,6 +68,13 @@ class detector:
         # Publicar el mensaje en el tópico "green_object"
         self.pub.publish(roi_msg)
         print("coordenadas X,Y: {}, {}".format(x,y))
+        #cpp
+        cx=ctypes.c_double(x)
+        cy=ctypes.c_double(y)
+        multiply_coordinates(ctypes.byref(cx), ctypes.byref(cy))
+        x_value = cx.value
+        y_value = cy.value
+        print("Resultado: x =", x_value, ", y =", y_value)
 
     # Mostrar la imagen con el objeto detectado
     #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
