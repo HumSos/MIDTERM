@@ -65,8 +65,8 @@ class detector:
 
         lib.multiplyCoordinates.argtypes = [ctypes.c_int]
         lib.multiplyCoordinates.restype = ctypes.c_int
-        cx100 = lib.multiplyCoordinates(ctypes.c_int(cx)) 
-        cy100 = lib.multiplyCoordinates(ctypes.c_int(cy))
+        cx100 = lib.multiplyCoordinates(ctypes.c_int(x)) 
+        cy100 = lib.multiplyCoordinates(ctypes.c_int(y))
         rospy.loginfo("Green object found at coordinates X: " + str(cx100) + ", Y: " + str(cy100) + "\ln")
 
         point_msg = Point()
