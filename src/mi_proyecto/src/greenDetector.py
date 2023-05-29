@@ -6,14 +6,6 @@ from sensor_msgs.msg import RegionOfInterest
 from cv_bridge import CvBridge
 import ctypes
 
-# Cargar la librería
-
-
-# Definir el tipo de la función y los argumentos
-multiply_coordinates = lib.multiplyCoordinates
-multiply_coordinates.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double)]
-multiply_coordinates.restype = None
-
 
 class detector:
     def detect_green_object(self,image):
