@@ -4,6 +4,15 @@ import coordinates_pb2_grpc
 import rospy
 
 class client:
+    def __init__(self):
+        # Inicializar el nodo ROS
+        rospy.init_node('grpc_client')
+        rate=rospy.Rate(10)
+        
+        while not rospy.is_shutdown():
+            self.consume_coordinates()
+            rate.sleep()
+
     def consume_coordinates():
         with grpc.insecure_channel('localhost:50051') as channel:
             # Crea un cliente para el servicio CoordinateService
