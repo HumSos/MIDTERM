@@ -1,0 +1,14 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package coordinate_service;
+
+message Coordinate {
+  float x = 1;
+  float y = 2;
+}
+
+service CoordinateService {
+  rpc GetCoordinates (google.protobuf.Empty) returns (stream Coordinate) {}
+}
+
+
