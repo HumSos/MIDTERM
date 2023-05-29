@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 import ctypes
 
 # Cargar la librería
-lib = ctypes.CDLL("/home/robotics/catkin_ws/src/mi_proyecto/lib/libmultiply.so")
+
 
 # Definir el tipo de la función y los argumentos
 multiply_coordinates = lib.multiplyCoordinates
@@ -69,12 +69,13 @@ class detector:
         self.pub.publish(roi_msg)
         print("coordenadas X,Y: {}, {}".format(x,y))
         #cpp
-        cx=ctypes.c_double(x)
-        cy=ctypes.c_double(y)
-        multiply_coordinates(ctypes.byref(cx), ctypes.byref(cy))
-        x_value = cx.value
-        y_value = cy.value
-        print("Resultado: x =", x_value, ", y =", y_value)
+        lib = ctypes.CDLL("/home/robotics/catkin_ws/src/mi_proyecto/lib/libcoordinate_multiplier.so")
+
+        lib.multiplyCoordinates.argtypes = [ctypes.c_int]
+        lib.multiplyCoordinates.restype = ctypes.c_int
+        cx100 = lib.multiplyCoordinates(ctypes.c_int(cx)) 
+        cy100 = lib.multiplyCoordinates(ctypes.c_int(cy))
+        rospy.loginfo("Green object found at coordinates X: " + str(cx100) + ", Y: " + str(cy100) + "\ln")
 
     # Mostrar la imagen con el objeto detectado
     #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
