@@ -69,7 +69,7 @@ class detector:
         cy100 = lib.multiplyCoordinates(ctypes.c_int(y))
         rospy.loginfo("Green object found at coordinates X: " + str(cx100) + ", Y: " + str(cy100) + "\ln")
 
-        pose_msg = PoseStamped()()
+        pose_msg = PoseStamped()
         pose_msg.pose.position.x = cx100
         pose_msg.pose.position.y = cy100 
         pose_msg.header.stamp = rospy.Time.now()
