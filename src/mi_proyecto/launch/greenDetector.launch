@@ -1,0 +1,3 @@
+<launch>
+  <node name="green_node" pkg="mi_proyecto" type="greenDetector.py" output="screen" />
+</launch>
