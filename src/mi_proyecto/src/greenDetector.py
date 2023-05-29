@@ -12,7 +12,13 @@ from concurrent import futures
 import coordinates_pb2
 import coordinates_pb2_grpc
 
+##
+# Clase para manejar los servicios de las coordenadas
+#
 class CoordinateServiceServicer(coordinates_pb2_grpc.CoordinateServiceServicer):
+    ##
+    # Funcion para obtener y devolver coordenadas
+    #
     def get_coordinates(self):
         while True:
             # Obtener las coordenadas del objeto
@@ -24,6 +30,10 @@ class CoordinateServiceServicer(coordinates_pb2_grpc.CoordinateServiceServicer):
             coordinate.y = y
 
             yield coordinate
+            
+    ##
+    #Funcion para request de coordenadas
+    #
     def GetCoordinates(self, request, context):
         # Implementa la lógica para obtener las coordenadas del objeto
         # y enviarlas como un flujo de mensajes
@@ -31,8 +41,13 @@ class CoordinateServiceServicer(coordinates_pb2_grpc.CoordinateServiceServicer):
             yield coordinate
 
     
-
+##
+# Clase donde se van a realizar los procesos relacionados con la deteccion del objeto y los calculos principales
+#
 class detector:
+    ##
+    # Funcion para detectar el objeto verde mas grande de la imagen y devolver sus coordenadas 
+    #
     def detect_green_object(self,image):
         # Convertir la imagen a formato HSV
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -55,6 +70,9 @@ class detector:
 
         return x, y, w, h
 
+    ##
+    # Funcion para inicializar el nodo del detector de objetos y procesos principales
+    #
     def __init__(self):
         # Inicializar el nodo ROS
         rospy.init_node('green_detector')
@@ -74,6 +92,9 @@ class detector:
             self.update()
             rate.sleep()
 
+    ##
+    # Funcion para hacer los calculos con las coordenadas y publicarlas
+    #
     def update(self):
         # Crear el objeto CvBridge
         bridge = CvBridge()
@@ -108,10 +129,6 @@ class detector:
         pose_msg.header.stamp = rospy.Time.now()
         # Publicar el mensaje en el tópico "green_object"
         self.pub.publish(pose_msg)
-
-    # Mostrar la imagen con el objeto detectado
-    #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    #cv2.imshow('Green Object Detection', image)
 
 if __name__ == '__main__':
     det = detector()

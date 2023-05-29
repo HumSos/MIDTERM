@@ -1,3 +1,4 @@
 <launch>
   <node name="green_node" pkg="mi_proyecto" type="greenDetector.py" output="screen" />
+  <node name="grpc_client" pkg="mi_proyecto" type="grpc_client.py" output="screen" />
 </launch>

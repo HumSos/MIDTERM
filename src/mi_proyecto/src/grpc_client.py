@@ -3,6 +3,9 @@ import coordinates_pb2
 import coordinates_pb2_grpc
 import rospy
 
+##
+# Clase del cliente
+#
 class client:
     def __init__(self):
         # Inicializar el nodo ROS
@@ -13,6 +16,9 @@ class client:
             self.consume_coordinates()
             rate.sleep()
 
+    ##
+    # Funcion para consumir las coordenadas
+    #
     def consume_coordinates():
         with grpc.insecure_channel('localhost:50051') as channel:
             # Crea un cliente para el servicio CoordinateService
