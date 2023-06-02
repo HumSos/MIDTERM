@@ -12,14 +12,18 @@ from concurrent import futures
 import coordinates_pb2
 import coordinates_pb2_grpc
 
-##
-# Clase para manejar los servicios de las coordenadas
-#
+
 class CoordinateServiceServicer(coordinates_pb2_grpc.CoordinateServiceServicer):
-    ##
-    # Funcion para obtener y devolver coordenadas
-    #
+    """
+    @class CoordinateServiceServicer
+    Clase para manejar los servicios de las coordenadas
+    """
+
     def get_coordinates(self):
+        """
+        @brief Obtener coordenadas
+        Obtiene las coordenadas y las devuelve
+        """
         while True:
             # Obtener las coordenadas del objeto
             x, y = get_object_coordinates()
@@ -31,28 +35,32 @@ class CoordinateServiceServicer(coordinates_pb2_grpc.CoordinateServiceServicer):
 
             yield coordinate
             
-    ##
-    #Funcion para request de coordenadas
-    #
     def GetCoordinates(self, request, context):
+        """
+        @brief GetCoordinates
+        Request de coordenadas
+        """
         # Implementa la lógica para obtener las coordenadas del objeto
         # y enviarlas como un flujo de mensajes
         for coordinate in self.get_coordinates():
             yield coordinate
 
     
-##
-# Clase donde se van a realizar los procesos relacionados con la deteccion del objeto y los calculos principales
-#
 class detector:
-    ##
-    # Funcion para detectar el objeto verde mas grande de la imagen y devolver sus coordenadas 
-    #
+    """
+    @class detector
+    Clase donde se van a realizar los procesos relacionados con la deteccion del objeto y los calculos principales
+    """
+    
     def detect_green_object(self,image):
+        """
+        @brief detect_green_object
+        Funcion para detectar el objeto verde mas grande de la imagen y devolver sus coordenadas 
+        """
         # Convertir la imagen a formato HSV
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-        # Definir el rango de colores verdes en HSV
+        # Rango de colores verdes en HSV
         lower_green = (40, 50, 50)
         upper_green = (70, 255, 255)
 
@@ -68,12 +76,13 @@ class detector:
         # Obtener el rectángulo delimitador y las coordenadas del objeto más grande
         x, y, w, h = cv2.boundingRect(largest_contour)
 
-        return x, y, w, h
+        return x, y
 
-    ##
-    # Funcion para inicializar el nodo del detector de objetos y procesos principales
-    #
     def __init__(self):
+        """
+        @brief constructor
+        Funcion para inicializar el nodo del detector de objetos y procesos principales
+        """
         # Inicializar el nodo ROS
         rospy.init_node('green_detector')
         rate=rospy.Rate(10)
@@ -92,10 +101,11 @@ class detector:
             self.update()
             rate.sleep()
 
-    ##
-    # Funcion para hacer los calculos con las coordenadas y publicarlas
-    #
     def update(self):
+        """
+        @brief update
+        Funcion para hacer los calculos con las coordenadas y publicarlas
+        """
         # Crear el objeto CvBridge
         bridge = CvBridge()
 
@@ -103,17 +113,13 @@ class detector:
         image = cv2.imread('/home/robotics/catkin_ws/src/mi_proyecto/src/imagen.jpg')
 
         # Detectar el objeto verde
-        x, y, w, h = self.detect_green_object(image)
+        x, y = self.detect_green_object(image)
 
-        # Crear el mensaje RegionOfInterest
-        roi_msg = RegionOfInterest()
-        roi_msg.x_offset = x
-        roi_msg.y_offset = y
-        roi_msg.width = w
-        roi_msg.height = h
+        # Crear el mensaje PoseStamped
+        pose_msg = PoseStamped()
+        pose_msg.pose.position.x = x
+        pose_msg.pose.position.y = y
 
-        
-        print("coordenadas X,Y: {}, {}".format(x,y))
         #cpp
         lib = ctypes.CDLL("/home/robotics/catkin_ws/src/mi_proyecto/lib/libcoordinate_multiplier.so")
 
@@ -123,12 +129,12 @@ class detector:
         cy100 = lib.multiplyCoordinates(ctypes.c_int(y))
         rospy.loginfo("Green object found at coordinates X: " + str(cx100) + ", Y: " + str(cy100) + "\ln")
 
-        pose_msg = PoseStamped()
-        pose_msg.pose.position.x = cx100
-        pose_msg.pose.position.y = cy100 
-        pose_msg.header.stamp = rospy.Time.now()
+        pose_msg100 = PoseStamped()
+        pose_msg100.pose.position.x = cx100
+        pose_msg100.pose.position.y = cy100 
+        pose_msg100.header.stamp = rospy.Time.now()
         # Publicar el mensaje en el tópico "green_object"
-        self.pub.publish(pose_msg)
+        self.pub.publish(pose_msg100)
 
 if __name__ == '__main__':
     det = detector()

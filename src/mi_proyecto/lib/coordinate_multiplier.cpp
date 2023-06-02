@@ -3,6 +3,9 @@
 #include <iostream>
 using namespace std;
 
+////
+//Funcion que multiplica la coordenada por 100
+//
 extern "C" {
   int multiplyCoordinates(int x) {
     int result = x * 100;
@@ -18,7 +21,7 @@ int main(int argc, char** argv)
   // Crear un objeto de tipo NodeHandle
   ros::NodeHandle nh;
 
-  // Obtener las coordenadas del usuario o cualquier otra fuente
+  // Obtiene coords
   int x = 10;
   // ...
 

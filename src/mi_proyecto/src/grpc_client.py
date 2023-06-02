@@ -3,11 +3,17 @@ import coordinates_pb2
 import coordinates_pb2_grpc
 import rospy
 
-##
-# Clase del cliente
-#
 class client:
+    """@class client
+    @brief gRPC client
+
+    """
     def __init__(self):
+        """
+        @brief Constructor
+
+        Función para inicializar el nodo de ros
+        """
         # Inicializar el nodo ROS
         rospy.init_node('grpc_client')
         rate=rospy.Rate(10)
@@ -16,20 +22,20 @@ class client:
             self.consume_coordinates()
             rate.sleep()
 
-    ##
-    # Funcion para consumir las coordenadas
-    #
     def consume_coordinates():
+        """@brief Consumir coordenadas.
+
+        Crea el cliente y hace la llamada
+        """
         with grpc.insecure_channel('localhost:50051') as channel:
             # Crea un cliente para el servicio CoordinateService
-            stub = coordinates_pb2_grpc.CoordinateServiceStub(channel)
+            stub = coordinates_pb2_grpc.GreenObjectServiceStub(channel)
 
             # Realiza la llamada al método GetCoordinates
-            response_iterator = stub.GetCoordinates(coordinates_pb2.Empty())
+            response = stub.PublishObjectCoordinates(coordinates_pb2.Empty())
 
-            # Itera sobre el flujo de coordenadas recibido
-            for coordinate in response_iterator:
-                print('Coordinate received:', coordinate)
+            # imprimir la respuesta
+            print("Coordenadas recibidas: x={}, y={}".format(response.x, response.y))
 
 if __name__ == '__main__':
     cli = client()

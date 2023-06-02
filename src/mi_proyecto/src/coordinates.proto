@@ -1,14 +1,22 @@
 syntax = "proto3";
-import "google/protobuf/empty.proto";
-package coordinate_service;
+package object_detection;
+import "google/api/annotations.proto";
 
-message Coordinate {
+message Empty {}
+
+message ObjectCoordinates {
   float x = 1;
   float y = 2;
+  float timestamp = 3;
 }
 
-service CoordinateService {
-  rpc GetCoordinates (google.protobuf.Empty) returns (stream Coordinate) {}
+service GreenObjectService {
+  rpc PublishObjectCoordinates(Empty) returns (ObjectCoordinates) {
+    option (google.api.http) = {
+      post: "/v1/green-object/coordinates"
+      body: "*"
+    };
+  }
 }
 
 

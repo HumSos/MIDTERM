@@ -1,0 +1,31 @@
+@startuml DFD
+allow_mixing
+
+frame Windows#lightgreen{
+agent Imagen
+agent CS
+}
+
+frame Docker#lightblue{
+agent CPP
+agent GreenDetector
+agent Wrapper
+agent Gateway
+agent Postman
+}
+
+Imagen --> GreenDetector : cv2.readImg
+GreenDetector --> CPP : coords
+CPP-left->GreenDetector : coords*100
+
+GreenDetector-right->Wrapper : /coords (std_msgs.Float64MultiArray)
+
+Wrapper-right->Gateway : Response
+Gateway-->Wrapper : Request
+
+CS-->Wrapper : Request
+Wrapper-up->CS : Response
+
+Postman-right->Gateway : GET
+Gateway-->Postman : Response
+@enduml
